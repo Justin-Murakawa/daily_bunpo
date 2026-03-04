@@ -1,0 +1,33 @@
+name: 📚 JLPT Grammar of the Day
+
+on:
+  schedule:
+    # Runs at 00:00 UTC = 09:00 JST every day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allows manual runs from the GitHub Actions tab (great for testing)
+
+jobs:
+  post-grammar:
+    name: Post daily grammar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          ANTHROPIC_API_KEY:     ${{ secrets.ANTHROPIC_API_KEY }}
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          MASTODON_INSTANCE:     ${{ secrets.MASTODON_INSTANCE }}
+        run: python bot.py
